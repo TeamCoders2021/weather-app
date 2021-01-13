@@ -1,0 +1,257 @@
+<SearchToolbar>:
+    size_hint_y: None
+    height: self.theme_cls.standard_increment
+    padding: 5
+    spacing: 12
+
+<NavDrawerItems>:
+    orientation: "vertical"
+    spacing: '8dp'
+    padding: '8dp'
+
+    MDCard:
+        orientation: "vertical"
+        elevation: 0
+        spacing: '10dp'
+        MDLabel:
+            text: "Good"
+            height: self.texture_size[1]
+            bold: True
+            size_hint_y: None
+            font_size: 20
+        MDLabel:
+            text: "Morning!"
+            height: self.texture_size[1]
+            bold: True
+            size_hint_y: None
+            font_size: 20
+        MDIconButton:
+            id: weather_icon
+            icon: "weather-night"
+            theme_text_color: "Custom"
+            text_color: app.theme_cls.primary_color
+            pos_hint: {"center_x": .8}
+            on_release: app.changetheme()
+
+    ScrollView:
+        id: scroll
+        do_scroll_x: False
+        size_hint: 1, 1
+
+        MDList:
+            OneLineIconListItem:
+                text: "Home"
+                on_release: app.test()
+                divider: None
+                IconLeftWidget:
+                    icon: "home-variant-outline"
+            OneLineIconListItem:
+                text: "Find weather"
+                on_release: app.test()
+                divider: None
+                IconLeftWidget:
+                    icon: "magnify"
+            OneLineIconListItem:
+                text: "Settings"
+                on_release: app.test()
+                divider: None
+                IconLeftWidget:
+                    icon: "settings-outline"
+            OneLineIconListItem:
+                text: "About"
+                on_release: app.test()
+                divider: None
+                IconLeftWidget:
+                    icon: "blank"
+
+NavigationLayout:
+    Manager:
+        id: screen_manager
+        SearchScreen:
+            name: "search"
+            md_bg_color: 1, 1, 1 ,1
+            SearchToolbar:
+                pos_hint: {"top": 1}
+                elevation: 0
+                Widget:
+                    size_hint_y: None
+                    size_hint_x: .1
+
+                MDTextFieldRound:
+                    id: main_search
+                    size_hint_y: None
+                    size_hint_x: .7
+                    hint_text: "City"
+                    halign: "left"
+                    width: 700
+                    pos_hint: {"center_x": .5}
+                    normal_color: [210/255, 211/255, 213/255, 1]
+                    line_color: [210/255, 211/255, 213/255, 1]
+                    color_active: [210/255, 211/255, 213/255, 1]
+
+                MDFillRoundFlatButton:
+                    id: search_btn
+                    pos_hint: {"center_x":.8}
+                    size_hint_y: None
+                    on_release: 
+                        app.find()
+                        screen_manager.current = "main"
+                    canvas:
+                        Color:
+                            rgba: (1, 1, 1, 0.2)
+                        RoundedRectangle:
+                            source: 'gradient.jpg'
+                            pos: self.pos
+                            size: self.size
+                            radius: [19]
+                    MDIcon:
+                        icon: "magnify"
+                        halign: "center"
+                        theme_text_color: "Custom"
+                        text_color: 1, 1, 1, 1
+
+                Widget:
+                    size_hint_y: None
+                    size_hint_x: .1
+            MDLabel:
+                text: "Find a city from the list of cities"
+                theme_text_color: "Custom"
+                font_size: 14
+                text_color: [.5, .5, .5, 1]
+                pos_hint: {"center_y":.86, "center_x": .55}
+
+        MainScreen:
+            name: "main"
+            md_bg_color: 1, 1, 1, 1
+            MDToolbar:
+                id: toolbar
+                md_bg_color: 1, 1, 1, 1
+                pos_hint: {"top": 1}
+                specific_text_color: 0, 0, 0, 1
+                elevation: 0
+                left_action_items: [["sort-variant", lambda x: nav_drawer.set_state("open")]]
+
+            FloatLayout:
+                id: sec_layout
+                padding: 8
+                MDLabel:
+                    text: f"{main_search.text}, Today"
+                    pos_hint: {"center_x": .55, "center_y": .85}
+                    font_size: 22
+                    halign: "center"
+                    bold: True
+                BoxLayout:
+                    orientation: "horizontal"
+                    spacing: 40
+                    pos_hint: {"center_x": .5, "center_y": .82}
+                    padding: 60
+                    MDCard:
+                        orientation: "vertical"
+                        size_hint: .6, .4
+                        md_bg_color: app.theme_cls.primary_color
+                        border_radius: 18
+                        radius: [20]
+                        MDLabel:
+                            id: main_weather
+                            text: "Hello"
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            pos_hint: {"center_x": .65}
+                            text_color: 1, 1, 1, 1
+                            font_size: 28
+                            bold: True
+                        MDLabel:
+                            id: temperature
+                            text: ""
+                            halign: "center"
+                            theme_text_color: "Custom"
+                            pos_hint: {"center_x": .65, "center_y": .3}
+                            text_color: 1, 1, 1, 1
+                            font_size: 55
+                            bold: True
+                        MDIcon:
+                            id: main_icon
+                            icon: "blank"
+                            font_size: 180
+                            pos_hint: {"center_x": .6}
+                            theme_text_color: "Custom"
+                            text_color: 1, 1, 1, 1
+                        Widget:
+                            height: "15dp"
+                MDLabel:
+                    text: "Favorite cities"
+                    bold: True
+                    pos_hint: {"center_x": .55,"center_y": .33}
+                    font_size: 25
+
+        WeatherPage:
+            id: weather_page
+            name: "weatherpage"
+            md_bg_color: 1, 1, 1, 1 
+            FloatLayout:
+                id: float_boy
+                MDToolbar:
+                    id: toolbar_2
+                    md_bg_color: 1, 1, 1, 1
+                    pos_hint: {"top": 1}
+                    specific_text_color: 0, 0, 0, 1
+                    elevation: 0
+                    left_action_items: [["chevron-left", lambda x: app.gomain()]]
+
+                MDLabel:
+                    id: main_city
+                    text: " "
+                    halign: "center"
+                    pos_hint: {"center_x": .5, "center_y":.9}
+                    font_style: "Button"
+                    font_size: 15
+
+                MDLabel: 
+                    text: "Today"
+                    halign: "center"
+                    bold: True
+                    font_size: 20
+                    pos_hint: {"center_y": .78}
+
+                BoxLayout:
+                    spacing: 35
+                    orientation: "horizontal"
+                    pos_hint: {"center_y": .7}    
+                    Widget:
+                        size_hint_x: .1
+                        size_hint_y: None
+                    MDCard:
+                        orientation: "horizontal"
+                        md_bg_color: app.theme_cls.primary_color
+                        border_radius: 28
+                        radius: [20]
+                        size_hint: .5, .3
+                        elevation: 2
+                    BoxLayout:
+                        orientation: "vertical"
+                        spacing: 35
+                        MDCard:
+                            orientation: "vertical"
+                            md_bg_color: [16/255, 171/255, 101/255, 1]
+                            border_radius: 28
+                            radius: [20]
+                            size: 120, 120
+                            size_hint: None, None
+                            elevation: 2
+                        MDCard:
+                            orientation: "vertical"
+                            md_bg_color: [0/255, 175/255, 239/255, 1]
+                            border_radius: 28
+                            radius: [20]
+                            size: 120, 120
+                            size_hint: None, None
+                            elevation: 2
+                    Widget:
+                        size_hint_x: .1
+                        size_hint_y: None
+
+    MDNavigationDrawer:
+        id: nav_drawer
+        elevation: 0
+        NavDrawerItems:
+    
