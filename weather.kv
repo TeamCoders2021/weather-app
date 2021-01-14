@@ -30,8 +30,10 @@
             icon: "weather-night"
             theme_text_color: "Custom"
             text_color: app.theme_cls.primary_color
-            pos_hint: {"center_x": .8}
-            on_release: app.changetheme()
+            pos_hint: {"center_x": .9}
+            halign: "right"
+            on_release: 
+                self.icon = "white-balance-sunny" if self.icon == "weather-night" else "weather-night" 
 
     ScrollView:
         id: scroll
@@ -41,13 +43,14 @@
         MDList:
             OneLineIconListItem:
                 text: "Home"
-                on_release: app.test()
+                on_release: app.gomain()
                 divider: None
                 IconLeftWidget:
                     icon: "home-variant-outline"
             OneLineIconListItem:
                 text: "Find weather"
-                on_release: app.test()
+                on_release: 
+                    app.search()
                 divider: None
                 IconLeftWidget:
                     icon: "magnify"
@@ -62,7 +65,7 @@
                 on_release: app.test()
                 divider: None
                 IconLeftWidget:
-                    icon: "blank"
+                    icon: "information-outline"
 
 NavigationLayout:
     Manager:
@@ -73,6 +76,7 @@ NavigationLayout:
             SearchToolbar:
                 pos_hint: {"top": 1}
                 elevation: 0
+                md_bg_color: app.theme_cls.bg_normal
                 Widget:
                     size_hint_y: None
                     size_hint_x: .1

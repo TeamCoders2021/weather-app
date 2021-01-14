@@ -41,7 +41,7 @@ class NavDrawerItems(BoxLayout):
 class SearchToolbar(RectangularElevationBehavior, ThemableBehavior, MDBoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.md_bg_color = [1, 1, 1, 1]
+        pass
 
 
 class WeatherApp(MDApp):
@@ -67,15 +67,24 @@ class WeatherApp(MDApp):
 
     def gomain(self):
         self.screen.ids.screen_manager.current = "main"
-        self.screen.ids.screen_manager.transition.direction = "right"
+        self.screen.ids.nav_drawer.set_state('close')
+    
+    def search(self):
+        self.screen.ids.screen_manager.current = "search"
+        self.screen.ids.nav_drawer.set_state('close')
+        self.screen.ids.main_search.text = ""
+
+    def settings(self):
+        self.screen.ids.screen_manager.current = "settings"
+        self.screen.ids.nav_drawer.set_state('close')
 
     def changetheme(self):
-        if self.screen.ids.weather_icon.icon == "weather-night":
-            weather_icon.icon = "white-balance-sunny"
+        if self.theme_cls.theme_style == "Light":
             self.theme_cls.theme_style = "Dark"
-        elif self.screen.ids.weather_icon.icon == "white-balance-sunny":
-            weather_icon.icon = "weather-night"
+            self.screen.ids.weather_icon.icon = "white-balance-sunny"
+        elif self.theme_cls.theme_style == "Dark":
             self.theme_cls.theme_style = "Light"
+            self.screen.ids.weather_icon.icon = "weather-night"
 
     def find(self):
         try:
@@ -115,6 +124,5 @@ class WeatherApp(MDApp):
                 pos_hint = {"center_x": .5, "center_y": .41},
                 halign = "center"
             ))
-            
 
 WeatherApp().run()
