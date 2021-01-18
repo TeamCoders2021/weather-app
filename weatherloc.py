@@ -10,7 +10,7 @@ from kivymd.uix.screen import MDScreen
 from kivymd.uix.textfield import MDTextFieldRound, MDTextField, MDTextFieldRect
 from kivy.uix.boxlayout import BoxLayout
 from kivymd.uix.dialog import MDDialog
-from kivymd.uix.button import MDFlatButton, MDFloatingActionButtonSpeedDial, MDRoundFlatButton
+from kivymd.uix.button import MDFlatButton, MDFloatingActionButtonSpeedDial, MDRoundFlatButton, MDRaisedButton
 from kivymd.uix.list import MDList, OneLineIconListItem, ILeftBodyTouch, OneLineListItem, ILeftBody, BaseListItem
 from kivy.properties import StringProperty, NumericProperty
 from kivymd.theming import ThemableBehavior
@@ -23,15 +23,24 @@ from kivymd.uix.bottomnavigation import MDBottomNavigation
 from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivy.core.audio import SoundLoader
+from kivymd.uix.spinner import MDSpinner
+import pandas as pd
+import matplotlib.pyplot as plot
 import requests
 
+class SplashScreen(MDScreen):
+    pass
 class MainScreen(MDScreen):
     pass
 class SearchScreen(MDScreen):
     pass
 class WeatherPage(MDScreen):
     pass
-class Settings(MDScreen):
+class SettingsPage(MDScreen):
+    pass
+class AlternateScreen(MDScreen):
+    pass
+class AboutPage(MDScreen):
     pass
 class Manager(ScreenManager):
     pass
@@ -49,18 +58,21 @@ class WeatherApp(MDApp):
         super().__init__(**kwargs)
         self.theme_cls.primary_palette = "Cyan"
         self.screen = Builder.load_file("weather.kv")
-        self.apikey = 'bf527f2c0ece63f0e185788e4ea21be3'
+        self.apikey = '804ec2a9beef39bfdc6f5d300b858502'
         self.base_url = 'http://api.openweathermap.org/data/2.5'
-        self.media = SoundLoader.load('Intentions.mp3')
+        self.csv_file = 'worldcities.csv'
+        self.data = pd.read_csv(self.csv_file)
+        self.cities = self.data["city"]
+        self.info_dialog = MDDialog(
+            text = "Successfully added to favourite cities!",
+            buttons = [MDRaisedButton(
+                text = "Done",
+                text_color = [1, 1, 1, 1]
+            )]
+        )
 
     def build(self):
         return self.screen
-
-    def test(self):
-        print('Hello world!')
-
-    def play(self):
-        self.media.play()
 
     def clear(self):
         self.screen.ids.sec_layout.clear_widgets()
@@ -68,25 +80,34 @@ class WeatherApp(MDApp):
     def gomain(self):
         self.screen.ids.screen_manager.current = "main"
         self.screen.ids.nav_drawer.set_state('close')
+
+    def settingspage(self):
+        self.screen.ids.screen_manager.current = "settings"
+        self.screen.ids.nav_drawer.set_state('close')
     
     def search(self):
-        self.screen.ids.screen_manager.current = "search"
+        self.screen.ids.screen_manager.current = "alternate"
         self.screen.ids.nav_drawer.set_state('close')
-        self.screen.ids.main_search.text = ""
+        self.screen.ids.favorite_search.text = ""
+
+    def show_dialog(self):
+        self.info_dialog.open()
+
+    def goabout(self):
+        self.screen.ids.screen_manager.current = "about"
+        self.screen.ids.nav_drawer.set_state('close')
 
     def settings(self):
         self.screen.ids.screen_manager.current = "settings"
         self.screen.ids.nav_drawer.set_state('close')
 
-    def changetheme(self):
-        if self.theme_cls.theme_style == "Light":
-            self.theme_cls.theme_style = "Dark"
-            self.screen.ids.weather_icon.icon = "white-balance-sunny"
-        elif self.theme_cls.theme_style == "Dark":
-            self.theme_cls.theme_style = "Light"
-            self.screen.ids.weather_icon.icon = "weather-night"
+    def addcities(self):
+        for city in list(self.cities):
+            self.screen.ids.cities_list.add_widget(OneLineListItem(
+                text = city,
+            ))
 
-    def find(self):
+    def find(self, *args):
         try:
             city = self.screen.ids.main_search.text
             full_url = f'{self.base_url}/weather?q={city}&appid={self.apikey}'
@@ -99,8 +120,9 @@ class WeatherApp(MDApp):
             cityname = result.get('name')
             real_temp = float(temp) - 273.15
             result = round(real_temp)
-            self.screen.ids.main_weather.text = description
+            self.screen.ids.main_weather.text = description.title()
             self.screen.ids.temperature.text = f'{result}°'
+            self.screen.ids.city_banner.text = f'{city}, {country}'
             if main == "Clear":
                 self.screen.ids.main_icon.icon = "weather-cloudy"
             elif main == "Sunny":
@@ -109,6 +131,8 @@ class WeatherApp(MDApp):
                 self.screen.ids.main_icon.icon = "weather-cloudy"
             elif main == "Rainy":
                 self.screen.ids.main_icon.icon = "weather-rainy"
+            else:
+                pass
 
         except Exception as e:
             self.clear()
@@ -124,5 +148,15 @@ class WeatherApp(MDApp):
                 pos_hint = {"center_x": .5, "center_y": .41},
                 halign = "center"
             ))
+
+    def screen_main(self, *args):
+        self.screen.ids.screen_manager.current = "main"
+
+    def screen_search(self, *args):
+        self.screen.ids.screen_manager.current = "search"
+
+    def load_spinner(self):
+        self.screen.ids.spinner.active = True
+        Clock.schedule_once(self.screen_main, 6)
 
 WeatherApp().run()
